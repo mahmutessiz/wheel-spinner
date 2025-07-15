@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const SQLiteStore = require('connect-sqlite3')(session);
-const { Telegraf } = require('telegraf');
+const { Telegraf, Markup } = require('telegraf');
 const path = require('path');
 const crypto = require('crypto');
 const db = require('./database.js');
@@ -256,7 +256,12 @@ bot.start((ctx) => {
                             console.error('Failed to update token', tokenErr);
                             return ctx.reply('An error occurred during login. Please try again.');
                         }
-                        ctx.reply('You have successfully logged in! You can now return to the website.');
+                        ctx.reply(
+                            'You have successfully logged in! You can now return to the website.',
+                            Markup.inlineKeyboard([
+                                Markup.button.url('Go to Website', 'https://spinner.agentwo.space')
+                            ])
+                        );
                     }
                 );
             });
