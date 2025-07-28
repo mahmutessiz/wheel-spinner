@@ -1,0 +1,249 @@
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-image: url("../images/bg1.webp"); /* Adjust the path if your image is in a different location */
+  background-size: cover; /* This will make the background image cover the entire body */
+  background-repeat: no-repeat; /* Prevents the image from repeating */
+  background-attachment: fixed; /* Keeps the background image fixed while scrolling */
+  background-position: center center; /* Centers the background image */
+}
+
+html::before {
+  content: ''; /* Required for pseudo-elements */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  background-color: rgba(0, 0, 0, 0.8); /* Black with 50% opacity */
+  z-index: -1; /* Place the overlay behind the content but above the background image */
+}
+
+main {
+  flex: 1;
+}
+
+
+.wheel-container {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  margin: 40px auto;
+}
+
+.wheel {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: #2a2a2a; /* Dark background */
+  border: 4px solid #9d4edd; /* Purple border */
+  transition: transform 5s cubic-bezier(0.25, 1, 0.5, 1);
+  box-shadow: 0 0 20px rgba(157, 78, 221, 0.5); /* Purple glow */
+  position: relative;
+  overflow: hidden;
+}
+
+.wheel-slice {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  clip-path: polygon(50% 50%, 29.3% 0, 70.7% 0);
+  transform-origin: 50% 50%;
+}
+
+/* Background colors for each slice */
+.wheel-slice:nth-child(1) {
+  background-color: #1b1919; /* Dark gray */
+}
+.wheel-slice:nth-child(2) {
+  background-color: #090116; /* Slightly lighter gray */
+}
+.wheel-slice:nth-child(3) {
+  background-color: #1b1919;/* Dark gray */
+}
+.wheel-slice:nth-child(4) {
+  background-color: #090116; /* Slightly lighter gray */
+}
+.wheel-slice:nth-child(5) {
+  background-color: #1b1919;/* Dark gray */
+}
+.wheel-slice:nth-child(6) {
+  background-color: #090116; /* Slightly lighter gray */
+}
+.wheel-slice:nth-child(7) {
+  background-color: #1b1919;/* Dark gray */
+}
+.wheel-slice:nth-child(8) {
+  background-color: #090116; /* Slightly lighter gray */
+}
+
+.wheel-slice:nth-child(1) {
+  transform: rotate(0deg);
+}
+.wheel-slice:nth-child(2) {
+  transform: rotate(45deg);
+}
+.wheel-slice:nth-child(3) {
+  transform: rotate(90deg);
+}
+.wheel-slice:nth-child(4) {
+  transform: rotate(135deg);
+}
+.wheel-slice:nth-child(5) {
+  transform: rotate(180deg);
+}
+.wheel-slice:nth-child(6) {
+  transform: rotate(225deg);
+}
+.wheel-slice:nth-child(7) {
+  transform: rotate(270deg);
+}
+.wheel-slice:nth-child(8) {
+  transform: rotate(315deg);
+}
+
+.wheel-slice span {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 18px;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+  text-align: center;
+}
+
+/* Add "Puan" text below the numbers */
+.wheel-slice span::after {
+  content: "Points";
+  display: block;
+  font-size: 12px;
+  margin-top: 2px;
+  color: #cccccc;
+}
+
+/* Individual slice text colors to match your image */
+.wheel-slice:nth-child(1) span {
+  color: #ff4757; /* Red for first slice */
+}
+.wheel-slice:nth-child(2) span {
+  color: #00d2d3; /* Cyan */
+}
+.wheel-slice:nth-child(3) span {
+  color: #ffa502; /* Orange */
+}
+.wheel-slice:nth-child(4) span {
+  color: #2ed573; /* Green */
+}
+.wheel-slice:nth-child(5) span {
+  color: #1e90ff; /* Blue */
+}
+.wheel-slice:nth-child(6) span {
+  color: #ffd700; /* Yellow */
+}
+.wheel-slice:nth-child(7) span {
+  color: #ff6b6b; /* Pink */
+}
+.wheel-slice:nth-child(8) span {
+  color: #9c88ff; /* Purple */
+}
+
+.wheel-pointer {
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 25px solid transparent;
+  border-right: 25px solid transparent;
+  border-top: 40px solid #9d4edd; /* Purple pointer */
+  filter: drop-shadow(0px -2px 2px rgba(0, 0, 0, 0.3));
+}
+
+.wheel-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  background-color: #9d4edd; /* Purple center */
+  border-radius: 50%;
+  border: 3px solid #7209b7; /* Darker purple border */
+  box-shadow: 0 0 10px rgba(157, 78, 221, 0.5);
+  background-image: url("../images/cogecoin-logo.png");
+  background-size: cover;
+  background-position: center;
+}
+
+#spin-button:disabled {
+  cursor: not-allowed;
+}
+
+.footer {
+  background-color: #0c0e0f86 !important;
+}
+
+@media (min-width: 768px) {
+  .wheel-container {
+    width: 400px;
+    height: 400px;
+  }
+
+  .wheel-slice span {
+    font-size: 20px;
+    top: 25px;
+  }
+
+  .wheel-center {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+@media (min-width: 992px) {
+  .wheel-container {
+    width: 500px;
+    height: 500px;
+  }
+
+  .wheel-slice span {
+    font-size: 24px;
+    top: 30px;
+  }
+
+  .wheel-center {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+.card {
+  border: 1px solid #9d4edd;
+  box-shadow: 0 0 15px rgba(157, 78, 221, 0.3);
+  transition: all 0.3s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 25px rgba(157, 78, 221, 0.5);
+}
+
+.modal-content {
+  background-color: #2a2a2a;
+  color: #ffffff;
+  border: 1px solid #9d4edd;
+}
+
+.modal-header {
+  border-bottom: 1px solid #9d4edd;
+}
+
+.btn-close {
+  filter: invert(1);
+}
