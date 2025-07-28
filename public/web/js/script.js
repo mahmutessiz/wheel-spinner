@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(response => response.json())
                 .then(data => {
                     const token = data.token;
-                    const botUsername = 'yarrak564864864_bot';
+                    const botUsername = 'cogeGifts_bot';
                     const telegramUrl = `https://t.me/${botUsername}?start=${token}`;
                     if (telegramTab) {
                         telegramTab.location.href = telegramUrl;
