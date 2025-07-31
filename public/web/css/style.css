@@ -86,7 +86,7 @@ main {
 }
 
 /* Add "Puan" text below the numbers */
-.wheel-slice:not(:nth-child(8)):not(:nth-child(9)):not(:nth-child(10)) span::after {
+.wheel-slice:not(:nth-child(9)):not(:nth-child(10)) span::after {
   content: "Points";
   display: block;
   font-size: 12px;
