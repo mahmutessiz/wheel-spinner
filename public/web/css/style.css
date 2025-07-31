@@ -86,19 +86,27 @@ main {
 }
 
 /* Add "Puan" text below the numbers */
-.wheel-slice:not(:nth-child(9)):not(:nth-child(10)) span::after {
+.wheel-slice:nth-child(1) span::after,
+.wheel-slice:nth-child(3) span::after,
+.wheel-slice:nth-child(4) span::after,
+.wheel-slice:nth-child(5) span::after,
+.wheel-slice:nth-child(7) span::after,
+.wheel-slice:nth-child(8) span::after,
+.wheel-slice:nth-child(9) span::after {
   content: "Points";
   display: block;
   font-size: 12px;
   margin-top: 2px;
   color: #cccccc;
 }
-.wheel-slice:nth-child(9) span,
-.wheel-slice:nth-child(10) span {
+
+/* Style the new prizes */
+.wheel-slice:nth-child(2) span,
+.wheel-slice:nth-child(6) span {
   color: #ffc107; /* Gold for the new prizes */
 }
-.wheel-slice:nth-child(9) span::after,
-.wheel-slice:nth-child(10) span::after {
+.wheel-slice:nth-child(2) span::after,
+.wheel-slice:nth-child(6) span::after {
   content: "COGE";
   display: block;
   font-size: 12px;
@@ -109,13 +117,15 @@ main {
 
 /* Individual slice text colors to match your image */
 .wheel-slice:nth-child(1) span { color: #ff4757; }
-.wheel-slice:nth-child(2) span { color: #00d2d3; }
-.wheel-slice:nth-child(3) span { color: #ffa502; }
-.wheel-slice:nth-child(4) span { color: #2ed573; }
-.wheel-slice:nth-child(5) span { color: #1e90ff; }
-.wheel-slice:nth-child(6) span { color: #ffd700; }
-.wheel-slice:nth-child(7) span { color: #ff6b6b; }
-.wheel-slice:nth-child(8) span { color: #9c88ff; }
+/* nth-child(2) is now a COGE prize */
+.wheel-slice:nth-child(3) span { color: #00d2d3; }
+.wheel-slice:nth-child(4) span { color: #ffa502; }
+.wheel-slice:nth-child(5) span { color: #2ed573; }
+/* nth-child(6) is now a COGE prize */
+.wheel-slice:nth-child(7) span { color: #1e90ff; }
+.wheel-slice:nth-child(8) span { color: #ffd700; }
+.wheel-slice:nth-child(9) span { color: #ff6b6b; }
+.wheel-slice:nth-child(10) span { color: #9c88ff; }
 
 .wheel-pointer {
   position: absolute;
