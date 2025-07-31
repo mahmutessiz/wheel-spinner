@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(response => response.json())
                 .then(data => {
                     const token = data.token;
-                    const botUsername = 'cogeGifts_bot';
+                    const botUsername = 'yarrak564864864_bot';
                     const telegramUrl = `https://t.me/${botUsername}?start=${token}`;
                     if (telegramTab) {
                         telegramTab.location.href = telegramUrl;
@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const { result, points, winningIndex } = data;
                     
                     // Calculate the rotation to land on the winning slice
-                    const sliceAngle = 360 / 8;
+                    const sliceAngle = 360 / 10; // Now 10 slices
                     const targetRotation = 360 - (winningIndex * sliceAngle);
 
                     const randomRotations = Math.floor(Math.random() * 5) + 5;
@@ -174,20 +174,35 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    withdrawRequestsBody.innerHTML = '';
+                    withdrawRequestsBody.innerHTML = ''; // Clear existing rows
                     if (data.history.length === 0) {
                         const row = document.createElement('tr');
-                        row.innerHTML = `<td colspan="4" class="text-center">No withdrawal history yet.</td>`;
+                        const cell = document.createElement('td');
+                        cell.colSpan = 4;
+                        cell.textContent = 'No withdrawal history yet.';
+                        cell.classList.add('text-center');
+                        row.appendChild(cell);
                         withdrawRequestsBody.appendChild(row);
                     } else {
                         data.history.forEach(request => {
                             const row = document.createElement('tr');
-                            row.innerHTML = `
-                                <td>${new Date(request.request_date).toLocaleString()}</td>
-                                <td>${request.points}</td>
-                                <td>${request.solana_address}</td>
-                                <td>${request.status}</td>
-                            `;
+
+                            const dateCell = document.createElement('td');
+                            dateCell.textContent = new Date(request.request_date).toLocaleString();
+                            row.appendChild(dateCell);
+
+                            const pointsCell = document.createElement('td');
+                            pointsCell.textContent = request.points;
+                            row.appendChild(pointsCell);
+
+                            const walletCell = document.createElement('td');
+                            walletCell.textContent = request.solana_address;
+                            row.appendChild(walletCell);
+
+                            const statusCell = document.createElement('td');
+                            statusCell.textContent = request.status;
+                            row.appendChild(statusCell);
+
                             withdrawRequestsBody.appendChild(row);
                         });
                     }

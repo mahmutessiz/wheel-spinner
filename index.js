@@ -150,13 +150,13 @@ app.post("/spin", (req, res) => {
 
     // Corresponds to the slices in index.html
     const pointsOptions = [10, 20, 50, 100, 200, 500, 1000, "JACKPOT"];
-    const winningIndex = Math.floor(Math.random() * pointsOptions.length);
+    const winningIndex = crypto.randomInt(pointsOptions.length);
     const result = pointsOptions[winningIndex];
 
     let pointsWon;
     if (result === "JACKPOT") {
       // Award a random amount between 2000 and 5000 for the jackpot
-      pointsWon = Math.floor(Math.random() * 3001) + 2000;
+      pointsWon = crypto.randomInt(2000, 5001);
     } else {
       pointsWon = result;
     }
