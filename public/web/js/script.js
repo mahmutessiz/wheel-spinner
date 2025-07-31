@@ -129,11 +129,23 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    const { result, points, winningIndex } = data;
+                    const { result } = data;
+
+                    // This array MUST match the order of slices in index.html
+                    const visualSlices = [10, '$200', 20, 50, 100, '$500', 200, 500, 1000, 'JACKPOT'];
                     
+                    // Find the visual index of the winning slice
+                    const visualWinningIndex = visualSlices.findIndex(slice => slice === result);
+
+                    // If for some reason the prize isn't found, default to the first slice to avoid errors
+                    if (visualWinningIndex === -1) {
+                        console.error("Could not find the winning slice in the visual layout!");
+                        visualWinningIndex = 0;
+                    }
+
                     // Calculate the rotation to land on the winning slice
-                    const sliceAngle = 360 / 10; // Now 10 slices
-                    const targetRotation = 360 - (winningIndex * sliceAngle);
+                    const sliceAngle = 360 / 10; // 10 slices
+                    const targetRotation = 360 - (visualWinningIndex * sliceAngle);
 
                     const randomRotations = Math.floor(Math.random() * 5) + 5;
                     const totalRotation = (360 * randomRotations) + targetRotation;
@@ -144,9 +156,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Wait for the animation to finish
                     setTimeout(() => {
                         if (result === 'JACKPOT') {
-                            spinResult.textContent = `JACKPOT! You won ${points} points!`;
+                            spinResult.textContent = `JACKPOT! You won ${data.points} points!`;
                         } else {
-                            spinResult.textContent = `Congratulations! You won ${points} points.`;
+                            spinResult.textContent = `Congratulations! You won ${data.points} points.`;
                         }
                         spinResult.classList.add('text-success');
                         // Update total points on the navbar

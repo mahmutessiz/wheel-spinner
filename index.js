@@ -187,7 +187,7 @@ app.post("/withdraw", (req, res) => {
   const userId = req.session.user.id;
   const { solanaAddress, points } = req.body;
 
-  if (!solanaAddress || !points || points < 100000) {
+  if (!solanaAddress || !points || points < 20000) {
     return res
       .status(400)
       .json({ success: false, message: "Invalid withdrawal request." });
