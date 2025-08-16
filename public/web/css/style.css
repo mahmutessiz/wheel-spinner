@@ -222,3 +222,12 @@ main {
 .btn-close {
   filter: invert(1);
 }
+
+.table-responsive {
+  background-color: transparent !important;
+}
+
+.table {
+  background-color: transparent !important;
+  color: white !important;
+}

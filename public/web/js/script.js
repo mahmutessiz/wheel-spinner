@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const spinResult = document.getElementById('spin-result');
     const wheel = document.querySelector('.wheel');
     const withdrawRequestsBody = document.getElementById('withdraw-requests-body');
+    const referralLinkInput = document.getElementById('referral-link');
+    const copyReferralLinkButton = document.getElementById('copy-referral-link');
 
     let pollingInterval = null;
     let currentRotation = 0;
@@ -33,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     userNav.classList.remove('d-none');
 
                     fetchWithdrawHistory();
+                    fetchReferralCode();
                 } else {
                     loginContainer.classList.remove('d-none');
                     userContainer.classList.add('d-none');
@@ -41,6 +44,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
     };
+
+    // Fetch referral code
+    const fetchReferralCode = () => {
+        fetch('/referral-code')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const referralCode = data.referralCode;
+                    const url = new URL(window.location.href);
+                    const referralLink = `${url.origin}?ref=${referralCode}`;
+                    referralLinkInput.value = referralLink;
+                }
+            });
+    };
+
+    // Copy referral link to clipboard
+    copyReferralLinkButton.addEventListener('click', () => {
+        const referralLink = referralLinkInput.value;
+        if (referralLink && navigator.clipboard) {
+            navigator.clipboard.writeText(referralLink).then(() => {
+                copyReferralLinkButton.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyReferralLinkButton.textContent = 'Copy';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+                // Fallback for older browsers
+                referralLinkInput.select();
+                document.execCommand('copy');
+            });
+        } else {
+            // Fallback for older browsers
+            referralLinkInput.select();
+            document.execCommand('copy');
+        }
+    });
 
     // Start the login process
     loginButtons.forEach(button => {
@@ -57,7 +96,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(data => {
                     const token = data.token;
                     const botUsername = 'cogeGifts_bot';
-                    const telegramUrl = `https://t.me/${botUsername}?start=${token}`;
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const ref = urlParams.get('ref');
+                    let startPayload = token;
+                    if (ref) {
+                        startPayload += `-${ref}`;
+                    }
+                    const telegramUrl = `https://t.me/${botUsername}?start=${startPayload}`;
                     if (telegramTab) {
                         telegramTab.location.href = telegramUrl;
                     }
@@ -90,6 +135,10 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(data => {
                 if (data.success) {
                     clearInterval(pollingInterval);
+                    // Clear the ref parameter from the URL
+                    const url = new URL(window.location.href);
+                    url.searchParams.delete('ref');
+                    window.history.replaceState({}, document.title, url);
                     location.reload(); // Reload the page to reflect the logged-in state
                 }
             });

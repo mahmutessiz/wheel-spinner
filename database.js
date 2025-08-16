@@ -33,11 +33,28 @@ db.serialize(() => {
             username TEXT,
             first_name TEXT,
             last_name TEXT,
+            referral_code TEXT UNIQUE,
+            referrer_id TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (referrer_id) REFERENCES users(id)
         )
     `, (err) => {
         if (err) console.error('Error creating users table', err.message);
+    });
+
+    // Table to track referrals
+    db.run(`
+        CREATE TABLE IF NOT EXISTS referrals (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            referrer_id TEXT NOT NULL,
+            referred_id TEXT NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (referrer_id) REFERENCES users(id),
+            FOREIGN KEY (referred_id) REFERENCES users(id)
+        )
+    `, (err) => {
+        if (err) console.error('Error creating referrals table', err.message);
     });
 
     // Trigger to automatically update the 'updated_at' timestamp on user update

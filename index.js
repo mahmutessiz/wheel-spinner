@@ -266,7 +266,11 @@ app.get("/withdraw-history", (req, res) => {
 });
 
 bot.start((ctx) => {
-  const token = ctx.startPayload;
+  const startPayload = ctx.startPayload;
+  const parts = startPayload.split("-");
+  const token = parts[0];
+  const referralCode = parts.length > 1 ? parts[1] : null;
+
   if (!token) {
     return ctx.reply(
       "Welcome! Please start the login process from our website."
@@ -286,53 +290,162 @@ bot.start((ctx) => {
         username: ctx.from.username,
       };
 
-      // Upsert user into the users table
-      const userSql = `
-                INSERT INTO users (id, username, first_name, last_name)
-                VALUES (?, ?, ?, ?)
-                ON CONFLICT(id) DO UPDATE SET
-                    username = excluded.username,
-                    first_name = excluded.first_name,
-                    last_name = excluded.last_name;
-            `;
-      db.run(
-        userSql,
-        [user.id, user.username, user.first_name, user.last_name],
-        (userErr) => {
-          if (userErr) {
-            console.error("Failed to save user", userErr);
+      // Check if the user already exists
+      db.get(
+        "SELECT id FROM users WHERE id = ?",
+        [user.id],
+        (err, existingUser) => {
+          if (err) {
+            console.error("Failed to check for existing user", err);
             return ctx.reply("An error occurred. Please try again.");
           }
 
-          // Update the token status
-          db.run(
-            "UPDATE tokens SET status = ?, user_id = ?, user_first_name = ?, user_username = ? WHERE token = ?",
-            ["authenticated", user.id, user.first_name, user.username, token],
-            (tokenErr) => {
-              if (tokenErr) {
-                console.error("Failed to update token", tokenErr);
-                return ctx.reply(
-                  "An error occurred during login. Please try again."
+          if (existingUser) {
+            // User already exists, just log them in
+            db.run(
+              "UPDATE tokens SET status = ?, user_id = ?, user_first_name = ?, user_username = ? WHERE token = ?",
+              [
+                "authenticated",
+                user.id,
+                user.first_name,
+                user.username,
+                token,
+              ],
+              (tokenErr) => {
+                if (tokenErr) {
+                  console.error("Failed to update token", tokenErr);
+                  return ctx.reply(
+                    "An error occurred during login. Please try again."
+                  );
+                }
+                ctx.reply(
+                  "You have successfully logged in!\n\nPlease return to your web browser to continue."
                 );
               }
-
-              ctx.reply(
-                "You have successfully logged in!\n\nPlease return to your web browser to continue.\n\n**Important for Mobile Users:** Telegram often opens links in its in-app browser, which may not keep you logged in. For the best experience, please switch to your phone's main browser (like Chrome or Safari) and navigate to https://gift.cogecoin.org/ manually.",
-                Markup.inlineKeyboard([
-                  Markup.button.url(
-                    "Go to Website",
-                    "https://gift.cogecoin.org/"
-                  ),
-                ])
-              );
-            }
-          );
+            );
+          } else {
+            // New user, handle referral and create account
+            handleNewUser(user, referralCode, ctx, token);
+          }
         }
       );
     } else {
       ctx.reply("This login link has already been used.");
     }
   });
+});
+
+function handleNewUser(user, referralCode, ctx, token) {
+  if (referralCode) {
+    db.get(
+      "SELECT id FROM users WHERE id = ?",
+      [referralCode],
+      (err, referrer) => {
+        if (err) {
+          console.error("Failed to find referrer", err);
+          // Continue creating the user without a referrer
+          createUser(user, null, ctx, token);
+        } else if (referrer) {
+          // Create user with referrer
+          createUser(user, referrer.id, ctx, token);
+        } else {
+          // Invalid referral code, create user without a referrer
+          createUser(user, null, ctx, token);
+        }
+      }
+    );
+  } else {
+    // No referral code, create user without a referrer
+    createUser(user, null, ctx, token);
+  }
+}
+
+function createUser(user, referrerId, ctx, token) {
+  const userSql = `
+        INSERT INTO users (id, username, first_name, last_name, referrer_id)
+        VALUES (?, ?, ?, ?, ?)
+    `;
+  db.run(
+    userSql,
+    [
+      user.id,
+      user.username,
+      user.first_name,
+      user.last_name,
+      referrerId,
+    ],
+    (userErr) => {
+      if (userErr) {
+        console.error("Failed to save user", userErr);
+        return ctx.reply("An error occurred. Please try again.");
+      }
+
+      if (referrerId) {
+        // Award points to the referrer
+        const pointsSql = `INSERT INTO spins (user_id, points) VALUES (?, ?)`;
+        db.run(pointsSql, [referrerId, 500], (pointsErr) => {
+          if (pointsErr) {
+            console.error("Failed to award referral points", pointsErr);
+          }
+        });
+
+        // Log the referral
+        const referralSql = `INSERT INTO referrals (referrer_id, referred_id) VALUES (?, ?)`;
+        db.run(referralSql, [referrerId, user.id], (referralErr) => {
+          if (referralErr) {
+            console.error("Failed to log referral", referralErr);
+          }
+        });
+      }
+
+      // Update the token status
+      db.run(
+        "UPDATE tokens SET status = ?, user_id = ?, user_first_name = ?, user_username = ? WHERE token = ?",
+        ["authenticated", user.id, user.first_name, user.username, token],
+        (tokenErr) => {
+          if (tokenErr) {
+            console.error("Failed to update token", tokenErr);
+            return ctx.reply(
+              "An error occurred during login. Please try again."
+            );
+          }
+
+          ctx.reply(
+            "You have successfully logged in!\n\nPlease return to your web browser to continue.\n\n**Important for Mobile Users:** Telegram often opens links in its in-app browser, which may not keep you logged in. For the best experience, please switch to your phone's main browser (like Chrome or Safari) and navigate to " + process.env.WEBSITE_URL + " manually.",
+            Markup.inlineKeyboard([
+              Markup.button.url("Go to Website", process.env.WEBSITE_URL),
+            ])
+          );
+        }
+      );
+    }
+  );
+}
+
+app.get("/referral-code", (req, res) => {
+  if (!req.session.user) {
+    return res
+      .status(401)
+      .json({ success: false, message: "You must be logged in." });
+  }
+  const userId = req.session.user.id;
+  db.get(
+    "SELECT id FROM users WHERE id = ?",
+    [userId],
+    (err, row) => {
+      if (err) {
+        console.error("Failed to get referral code", err);
+        return res
+          .status(500)
+          .json({ success: false, message: "Error getting referral code." });
+      }
+      if (row) {
+        res.json({ success: true, referralCode: row.id });
+      } else {
+        res.status(404).json({ success: false, message: "User not found." });
+      }
+    }
+  );
 });
 
 app.get("/", (req, res) => {
