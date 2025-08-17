@@ -33,7 +33,6 @@ db.serialize(() => {
             username TEXT,
             first_name TEXT,
             last_name TEXT,
-            referral_code TEXT,
             referrer_id TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
