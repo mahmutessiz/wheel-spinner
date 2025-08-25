@@ -243,6 +243,97 @@ app.post("/withdraw", (req, res) => {
   });
 });
 
+app.post("/purchase", (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).json({
+      success: false,
+      message: "You must be logged in to make a purchase.",
+    });
+  }
+
+  const userId = req.session.user.id;
+  const { item, points } = req.body;
+
+  // Validate item and points
+  const validItems = {
+    "ps5-pro": 1100000,
+    "pet-food": 20000,
+    "iphone-16": 2400000,
+    "rtx-5070-ti": 1600000,
+    "amd-radeon-9700xt": 1300000,
+    "pet-house": 200000
+  };
+
+  if (!item) {
+    return res.status(400).json({
+      success: false,
+      message: "Item is required.",
+    });
+  }
+
+  if (!points || points <= 0) {
+    return res.status(400).json({
+      success: false,
+      message: "Valid points amount is required.",
+    });
+  }
+
+  // If item is in our list, verify the points match
+  if (validItems[item] && points !== validItems[item]) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid points amount for this item.",
+    });
+  }
+
+  // Check if the user has enough points
+  const sql = `SELECT SUM(points) AS total_points FROM spins WHERE user_id = ?`;
+  db.get(sql, [userId], (err, row) => {
+    if (err) {
+      console.error("Failed to get total points", err);
+      return res
+        .status(500)
+        .json({ success: false, message: "Error getting your points." });
+    }
+
+    const totalPoints = row ? row.total_points : 0;
+
+    if (totalPoints < points) {
+      return res.status(400).json({
+        success: false,
+        message: "You do not have enough points to make this purchase.",
+      });
+    }
+
+    // Record the purchase
+    const purchaseSql = `INSERT INTO purchases (user_id, item, points) VALUES (?, ?, ?)`;
+    db.run(purchaseSql, [userId, item, points], (purchaseErr) => {
+      if (purchaseErr) {
+        console.error("Failed to record purchase", purchaseErr);
+        return res
+          .status(500)
+          .json({ success: false, message: "Error recording your purchase." });
+      }
+
+      // Deduct the points by adding a negative spin entry
+      const deductSql = `INSERT INTO spins (user_id, points) VALUES (?, ?)`;
+      db.run(deductSql, [userId, -points], (deductErr) => {
+        if (deductErr) {
+          console.error("Failed to deduct points", deductErr);
+          return res
+            .status(500)
+            .json({ success: false, message: "Error processing your purchase." });
+        }
+
+        res.json({
+          success: true,
+          message: `Successfully purchased ${item.replace('-', ' ')}.`,
+        });
+      });
+    });
+  });
+});
+
 app.get("/withdraw-history", (req, res) => {
   if (!req.session.user) {
     return res.status(401).json({
@@ -259,6 +350,28 @@ app.get("/withdraw-history", (req, res) => {
       return res.status(500).json({
         success: false,
         message: "Error getting your withdrawal history.",
+      });
+    }
+    res.json({ success: true, history: rows });
+  });
+});
+
+app.get("/purchase-history", (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).json({
+      success: false,
+      message: "You must be logged in to view your purchase history.",
+    });
+  }
+
+  const userId = req.session.user.id;
+  const sql = `SELECT * FROM purchases WHERE user_id = ? ORDER BY purchase_date DESC`;
+  db.all(sql, [userId], (err, rows) => {
+    if (err) {
+      console.error("Failed to get purchase history", err);
+      return res.status(500).json({
+        success: false,
+        message: "Error getting your purchase history.",
       });
     }
     res.json({ success: true, history: rows });

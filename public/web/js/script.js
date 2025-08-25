@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     userNav.classList.remove('d-none');
 
                     fetchWithdrawHistory();
+                    fetchPurchaseHistory();
                     fetchReferralCode();
                 } else {
                     loginContainer.classList.remove('d-none');
@@ -95,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(response => response.json())
                 .then(data => {
                     const token = data.token;
-                    const botUsername = 'cogeGifts_bot';
+                    const botUsername = 'yarrak564864864_bot';
                     const urlParams = new URLSearchParams(window.location.search);
                     const ref = urlParams.get('ref');
                     let startPayload = token;
@@ -271,6 +272,48 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     };
 
+    const fetchPurchaseHistory = () => {
+        const purchaseHistoryBody = document.getElementById('purchase-history-body');
+        if (!purchaseHistoryBody) return; // Skip if element doesn't exist
+
+        fetch('/purchase-history')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    purchaseHistoryBody.innerHTML = ''; // Clear existing rows
+                    if (data.history.length === 0) {
+                        const row = document.createElement('tr');
+                        const cell = document.createElement('td');
+                        cell.colSpan = 3;
+                        cell.textContent = 'No purchase history yet.';
+                        cell.classList.add('text-center');
+                        row.appendChild(cell);
+                        purchaseHistoryBody.appendChild(row);
+                    } else {
+                        data.history.forEach(purchase => {
+                            const row = document.createElement('tr');
+
+                            const dateCell = document.createElement('td');
+                            dateCell.textContent = new Date(purchase.purchase_date).toLocaleString();
+                            row.appendChild(dateCell);
+
+                            const itemCell = document.createElement('td');
+                            // Format item name (replace hyphens with spaces and capitalize words)
+                            const formattedItem = purchase.item.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                            itemCell.textContent = formattedItem;
+                            row.appendChild(itemCell);
+
+                            const pointsCell = document.createElement('td');
+                            pointsCell.textContent = purchase.points;
+                            row.appendChild(pointsCell);
+
+                            purchaseHistoryBody.appendChild(row);
+                        });
+                    }
+                }
+            });
+    };
+
     const withdrawModalElement = document.getElementById('withdraw-modal');
     const withdrawModal = new bootstrap.Modal(withdrawModalElement);
 
@@ -324,6 +367,52 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .finally(() => {
             submitButton.disabled = false;
+        });
+    });
+
+    // Handle store purchases
+    const purchaseButtons = document.querySelectorAll('.purchase-btn');
+    purchaseButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const item = button.getAttribute('data-item');
+            const points = parseInt(button.getAttribute('data-points'));
+            const currentUserPoints = parseInt(totalPoints.textContent, 10);
+
+            if (points > currentUserPoints) {
+                alert(`You don't have enough points to purchase this item. You need ${points} points but you only have ${currentUserPoints} points.`);
+                return;
+            }
+
+            // Disable button during purchase
+            button.disabled = true;
+            const originalText = button.textContent;
+            button.textContent = 'Processing...';
+
+            // Send purchase request to server
+            fetch('/purchase', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ item, points })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`Congratulations! You've successfully purchased the ${item.replace('-', ' ')}.`);
+                    // Update points display
+                    checkAuth();
+                } else {
+                    alert(`Error: ${data.message}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error purchasing item:', error);
+                alert('An error occurred while processing your purchase. Please try again.');
+            })
+            .finally(() => {
+                // Re-enable button
+                button.disabled = false;
+                button.textContent = originalText;
+            });
         });
     });
 });

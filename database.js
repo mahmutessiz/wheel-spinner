@@ -96,6 +96,20 @@ db.serialize(() => {
     `, (err) => {
         if (err) console.error('Error creating withdraw_requests table', err.message);
     });
+
+    // Table to store store purchases
+    db.run(`
+        CREATE TABLE IF NOT EXISTS purchases (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT NOT NULL,
+            item TEXT NOT NULL,
+            points INTEGER NOT NULL,
+            purchase_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    `, (err) => {
+        if (err) console.error('Error creating purchases table', err.message);
+    });
 });
 
 module.exports = db;
