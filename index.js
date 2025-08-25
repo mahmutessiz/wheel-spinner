@@ -383,7 +383,7 @@ function createUser(user, referrerId, ctx, token) {
       if (referrerId) {
         // Award points to the referrer
         const pointsSql = `INSERT INTO spins (user_id, points) VALUES (?, ?)`;
-        db.run(pointsSql, [referrerId, 500], (pointsErr) => {
+        db.run(pointsSql, [referrerId, 50], (pointsErr) => {
           if (pointsErr) {
             console.error("Failed to award referral points", pointsErr);
           }
