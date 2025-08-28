@@ -107,7 +107,7 @@ main {
 }
 .wheel-slice:nth-child(2) span::after,
 .wheel-slice:nth-child(6) span::after {
-  content: "COGE";
+  content: ""; /* COGE */
   display: block;
   font-size: 12px;
   margin-top: 2px;
