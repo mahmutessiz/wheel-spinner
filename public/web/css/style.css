@@ -151,10 +151,11 @@ main {
   border-radius: 50%;
   border: 3px solid #7209b7; /* Darker purple border */
   box-shadow: 0 0 10px rgba(157, 78, 221, 0.5);
-  background-image: url("../images/cogecoin-logo.png");
+  background-image: url("../images/chicken.webp"); /* ../images/cogecoin-logo.png */
   background-size: cover;
   background-position: center;
 }
+
 
 #spin-button:disabled {
   cursor: not-allowed;

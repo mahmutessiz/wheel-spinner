@@ -260,7 +260,7 @@ app.post("/purchase", (req, res) => {
     "pet-food": 20000,
     "iphone-16": 2400000,
     "rtx-5070-ti": 1600000,
-    "amd-radeon-9700xt": 1300000,
+    "amd-radeon-9070-xt": 1300000,
     "pet-house": 200000
   };
 

@@ -21,12 +21,13 @@
           class="d-flex align-items-center gap-2"
           style="margin-top: -0.2rem"
         >
+          <!-- ./images/cogecoin-logo.png -->
           <img
-            src="./images/cogecoin-logo.png"
+            src="./images/chicken.webp"
             style="width: 40px; height: 40px"
             alt=""
           />
-          <a class="navbar-brand" href="#">Coge Gifts</a>
+          <!-- <a class="navbar-brand" href="#">Coge Gifts</a> -->
         </div>
         <div
           id="user-nav"
@@ -90,7 +91,11 @@
           height: 80vh;
         "
       >
-        <h1 class="display-4">Welcome to the Coge Gifts Wheel!</h1>
+        <h1 class="display-4">
+          Welcome to the
+          <!-- Coge -->
+          Gifts Wheel!
+        </h1>
         <p class="lead">
           Login with your Telegram account to spin the wheel and win points.
         </p>
@@ -127,6 +132,7 @@
           <button
             id="spin-button"
             class="d-flex align-items-center justify-content-center gap-2 mt-4 btn btn-lg btn-success"
+            disabled
           >
             <img
               src="./images/spin.svg"
@@ -301,7 +307,7 @@
                   </p>
                   <button
                     class="btn btn-primary purchase-btn"
-                    data-item="amd-radeon-9700xt"
+                    data-item="amd-radeon-9070-xt"
                     data-points="1300000"
                   >
                     Purchase
@@ -384,7 +390,7 @@
             </h4>
           </div>
           <div class="justify-content-center text-center row">
-            <div class="mb-4 col-md-4">
+            <!-- <div class="mb-4 col-md-4">
               <div class="bg-dark h-100 text-white card">
                 <div
                   class="d-flex flex-column justify-content-center card-body"
@@ -395,7 +401,7 @@
                   </p>
                 </div>
               </div>
-            </div>
+            </div> -->
             <div class="mb-4 col-md-4">
               <div class="bg-dark h-100 text-white card">
                 <div
@@ -403,7 +409,8 @@
                 >
                   <h5 class="text-warning card-title fs-3">50,000 Points</h5>
                   <p class="mt-2 text-success card-text fs-4 fw-bold">
-                    $25 in $COGE
+                    $25
+                    <!--  in $COGE -->
                   </p>
                 </div>
               </div>
@@ -415,7 +422,8 @@
                 >
                   <h5 class="text-warning card-title fs-3">100,000 Points</h5>
                   <p class="mt-2 text-success card-text fs-4 fw-bold">
-                    $50 in $COGE
+                    $50
+                    <!-- in $COGE -->
                   </p>
                 </div>
               </div>
@@ -496,9 +504,17 @@
                   >Points to Withdraw</label
                 >
                 <select class="form-select" id="points-amount" required>
-                  <option value="20000">$10 in $COGE (20,000 Points)</option>
-                  <option value="50000">$25 in $COGE (50,000 Points)</option>
-                  <option value="100000">$50 in $COGE (100,000 Points)</option>
+                  <!-- <option value="20000">$10 in $COGE (20,000 Points)</option> -->
+                  <option value="50000">
+                    $25
+                    <!-- in $COGE -->
+                    (50,000 Points)
+                  </option>
+                  <option value="100000">
+                    $50
+                    <!-- in $COGE -->
+                    (100,000 Points)
+                  </option>
                 </select>
               </div>
               <button type="submit" class="btn btn-primary">
@@ -512,7 +528,7 @@
 
     <footer class="bg-dark mt-auto py-3 text-white text-center footer">
       <div class="container">
-        <span>&copy; 2025 Cogecoin. All Rights Reserved.</span>
+        <!-- <span>&copy; 2025 Cogecoin. All Rights Reserved.</span> -->
       </div>
     </footer>
 
